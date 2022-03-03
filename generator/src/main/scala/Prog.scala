@@ -402,9 +402,9 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
   def code_header(use: EnabledInstructions, fprnd: Int) =
   {
     "\n" +
-    (if (use.vec) "RVTEST_RV64UV\n"
-     else if (use.fpu) "RVTEST_RV64UF\n"
-     else "RVTEST_RV64U\n") +
+    (if (use.vec) "RVTEST_RV32UV\n"
+     else if (use.fpu) "RVTEST_RV32UF\n"
+     else "RVTEST_RV32U\n") +
     "RVTEST_CODE_BEGIN\n" +
     (if (use.vec) init_vector() else "") + 
     "\n" +

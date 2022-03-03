@@ -119,6 +119,8 @@ class Inst(opcode: String, val operands: Array[Operand])
   def is_vmisc = List("vsetcfg", "vstop", "vsetvl", "veidx", "vf",
     "vmcs", "vmca", "fence").contains(opcode)
 
+  def is_extra: Boolean = List("C.FLD", "C.FLDSP", "C.FLWSP", "C.FSD", "C.FSDSP", "C.FSW", "C.FSWSP", "ECALL\n1:").contains(opcode)
+
   override def toString =
   {
     operands.find(op => op.isInstanceOf[PredReg]) match {
@@ -533,3 +535,13 @@ object FMOVN extends Opcode("fmovn")
 object FENCE_V extends Opcode("fence")
 
 object ILLEGAL extends Opcode(".word")
+
+object C_FLD extends Opcode("C.FLD")
+object C_FLW extends Opcode("C.FLW")
+object C_FLDSP extends Opcode("C.FLDSP")
+object C_FLWSP extends Opcode("C.FLWSP")
+object C_FSD extends Opcode("C.FSD")
+object C_FSDSP extends Opcode("C.FSDSP")
+object C_FSW extends Opcode("C.FSW")
+object C_FSWSP extends Opcode("C.FSWSP")
+object ECALL extends Opcode("ECALL\n1:")

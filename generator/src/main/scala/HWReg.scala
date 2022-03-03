@@ -62,6 +62,13 @@ object HWReg
     else filter_write_hidden_other(other) _
   }
 
+  def filter_read_c_freg_visible = (hwreg: HWReg) => (hwreg.name == "f8" || hwreg.name == "f9" || hwreg.name == "f10" || hwreg.name == "f11" || hwreg.name == "f12" || hwreg.name == "f13" || hwreg.name == "f14" || hwreg.name == "f15") && filter_read_visible(hwreg)
+  def filter_write_c_freg_visible = (hwreg: HWReg) => (hwreg.name == "f8" || hwreg.name == "f9" || hwreg.name == "f10" || hwreg.name == "f11" || hwreg.name == "f12" || hwreg.name == "f13" || hwreg.name == "f14" || hwreg.name == "f15") && filter_write_visible(hwreg)
+  def filter_write_c_xreg_hidden = (hwreg: HWReg) => (hwreg.name == "x8" || hwreg.name == "x9" || hwreg.name == "x10" || hwreg.name == "x11" || hwreg.name == "x12" || hwreg.name == "x13" || hwreg.name == "x14" || hwreg.name == "x15") && filter_write_hidden(hwreg)
+  def filter_write_sp_hidden = (hwreg: HWReg) => hwreg.name == "x2" && filter_write_hidden(hwreg)
+
+  def filter_write_t2_visible = (hwreg: HWReg) => hwreg.name == "x7" && filter_write_visible(hwreg)
+
   def alloc_read = (hwreg: HWReg) => hwreg.readers += 1
   def alloc_write(visible: Boolean)(hwreg: HWReg) =
   {

@@ -66,7 +66,7 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
   for (cat <- List(("alu"),("cmp"),("branch"),("jalr"),
     ("jmp"),("la"),("mem"),("amo"),("misc"),("fpalu"),("fpcmp"),
     ("fpfma"),("fpmem"),("fpcvt"),("fpmisc"),("vmem"),("vamo"),("valu"),
-    ("vmisc"),("vfpalu"),("vfpfma"),("vfpcvt"),("vsmem"),("vshared"),("vpred"),("vcmp"),("unknown")))
+    ("vmisc"),("vfpalu"),("vfpfma"),("vfpcvt"),("vsmem"),("vshared"),("vpred"),("vcmp"),("extra"),("unknown")))
     {
       catstats(cat)=0
       opstats(cat) = new HashMap[String,Int].withDefaultValue(0)
@@ -172,7 +172,7 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
     def seq_lt(seq1: (String, Int), seq2: (String, Int)): Boolean =
     {
       val seqhash = HashMap("xmem"->1,"xbranch"->2,"xalu"->3,"vmem"->4, 
-      "fgen"->5,"fpmem"->6,"fax"->7,"fdiv"->8,"vec"->9,"vonly"->10,"valu"->11,"Generic"->12).withDefaultValue(100)
+      "fgen"->5,"fpmem"->6,"fax"->7,"fdiv"->8,"vec"->9,"vonly"->10,"valu"->11,"Generic"->12,"extra"->13).withDefaultValue(100)
       if (seqhash(seq1._1) == 100 && seqhash(seq2._1) == 100) return (seq1._1 < seq2._1)
       return seqhash(seq1._1) < seqhash(seq2._1)
     }
@@ -223,7 +223,7 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
       val cathash = HashMap("alu"->1,"cmp"->2,"branch"->3,"jmp"->4,"jalr"->5,
         "la"->6,"mem"->7,"amo"->8,"misc"->9,"fpalu"->10,"fpcmp"->11,"fpfma"->12,
         "fpmem"->13,"fpcvt"->14,"fpmisc"->15,"vmem"->16,"vamo"->17,"valu"->18,"vfpalu"->19,
-        "vfpfma"->20,"vfpcvt"->21,"vsmem"->22,"vshared"->23,"vpred"->24,"vcmp"->25,"vmisc"->26,"unknown"->27)
+        "vfpfma"->20,"vfpcvt"->21,"vsmem"->22,"vshared"->23,"vpred"->24,"vcmp"->25,"vmisc"->26,"extra"->27,"unknown"->28)
       return cathash(cat1._1) < cathash(cat2._1)
     }
 
@@ -314,7 +314,7 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
     }
   }
 
-  def names = List("xmem","xbranch","xalu","fgen","fpmem","fax","fdiv","vec")
+  def names = List("xmem","xbranch","xalu","fgen","fpmem","fax","fdiv","vec","extra")
 
   def code_body(use: EnabledInstructions, seqnum: Int, mix: Map[String, Int], veccfg: Map[String, String], segment: Boolean) =
   {
@@ -326,7 +326,8 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
       "fpmem" -> (() => new SeqFPMem(use, xregs, fregs_s, fregs_d, core_memory)),
       "fax" -> (() => new SeqFaX(use, xregs, fregs_s, fregs_d)),
       "fdiv" -> (() => new SeqFDiv(use, fregs_s, fregs_d)),
-      "vec" -> (() => new SeqVec(xregs, vxregs, vpregs, vsregs, varegs, used_vl, veccfg)))
+      "vec" -> (() => new SeqVec(xregs, vxregs, vpregs, vsregs, varegs, used_vl, veccfg)),
+      "extra" -> (() => new SeqExtra(use, xregs, fregs_s, fregs_d, core_memory)))
 
     prob_tbl = new ArrayBuffer[(Int, () => InstSeq)]
     nseqs = seqnum
@@ -536,7 +537,7 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
   }
 
   def statistics(nseqs: Int, fprnd: Int, mix: Map[String, Int], vnseq: Int, vmemsize: Int, vfnum: Int, vecmix: Map[String, Int],
-                 use_amo: Boolean, use_mul: Boolean, use_div: Boolean) =
+                 use_amo: Boolean, use_mul: Boolean, use_div: Boolean, use_extra: Boolean) =
   {
     "--------------------------------------------------------------------------\n" + 
     "-- Statistics for assembly code created by RISCV torture test generator --\n" +
@@ -551,7 +552,8 @@ class Prog(use: EnabledInstructions, memsize: Int, veccfg: Map[String,String], l
     "---------- fprnd = " + fprnd + " ----------\n" +
     "---------- use_amo = " + use_amo + " ----------\n" +
     "---------- use_mul = " + use_mul + " ----------\n" +
-    "---------- use_div = " + use_div + " ----------\n" + 
+    "---------- use_div = " + use_div + " ----------\n" +
+    "---------- use_extra = " + use_extra + " ----------\n" +
     "--------------------------------------------------------------------------\n\n" +
     "--------------------------------------------------------------------------\n" +
     sequence_stats(mix, vecmix, nseqs, vnseq, vfnum) +

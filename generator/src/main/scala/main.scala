@@ -60,8 +60,9 @@ object Generator extends App
     val useFPS  = (standards.contains("F") || standards.contains("G")) && useFPU
     val useFPD  = (standards.contains("D") || standards.contains("G")) && useFPU
     val useComp = (standards.contains("C"))
+    val useExtra = (config.getProperty("torture.generator.extra", "false").toLowerCase == "true")
 
-    val use = EnabledInstructions(xlen.toInt, useAmo, useMul, useDiv, useFPS, useFPD, useComp, useVec)
+    val use = EnabledInstructions(xlen.toInt, useAmo, useMul, useDiv, useFPS, useFPD, useComp, useVec, useExtra)
     generate(nseqs, memsize, fprnd, mix, vec, outFileName, segment, loop, loop_size, use)
   }
 
@@ -77,7 +78,7 @@ object Generator extends App
       loop_size: Int,
       use: EnabledInstructions): String = {
     assert (mix.values.sum == 100, println("The instruction mix specified in config does not add up to 100%"))
-    assert (mix.keys.forall(List("xmem","xbranch","xalu","fgen","fpmem","fax","fdiv","vec") contains _), println("The instruction mix specified in config contains an unknown sequence type name"))
+    assert (mix.keys.forall(List("xmem","xbranch","xalu","fgen","fpmem","fax","fdiv","vec","extra") contains _), println("The instruction mix specified in config contains an unknown sequence type name"))
     
     println("Instructions enabled for generation: " + use)
 
@@ -97,7 +98,7 @@ object Generator extends App
     val fw = new FileWriter(oname)
     fw.write(s)
     fw.close()
-    val stats = prog.statistics(nseqs,fprnd,mix,vnseq,vmemsize,vfnum,vecmix,use.amo,use.mul,use.div)
+    val stats = prog.statistics(nseqs,fprnd,mix,vnseq,vmemsize,vfnum,vecmix,use.amo,use.mul,use.div,use.extra)
     val sname = "output/" + outFileName + ".stats"
     val fw2 = new FileWriter(sname)
     fw2.write(stats)

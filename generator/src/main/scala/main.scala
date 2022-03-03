@@ -50,7 +50,7 @@ object Generator extends App
     val useFPU = (mix.filterKeys(List("fgen","fpmem","fax","fdiv") contains _).values.reduce(_+_) > 0) || useVec
 
     val parseIsa = """RV(\d*)([A-Z]+)""".r
-    val parseIsa(xlen, standards) = isaName
+    val parseIsa(xlen, standards) = isaName.toUpperCase
     val useAmo  = (standards.contains("A") || standards.contains("G")) &&
                     (config.getProperty("torture.generator.amo", "true").toLowerCase == "true")
     val useMul  = (standards.contains("M") || standards.contains("G")) &&

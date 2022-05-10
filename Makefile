@@ -1,6 +1,7 @@
 # Convenience Makefile
 
-SBT ?= java -Xmx1G -Xss8M -XX:MaxPermSize=128M -jar sbt-launch.jar
+# SBT ?= java -Xmx1G -Xss8M -jar sbt-launch.jar
+SBT ?= java -Xmx1G -Xss8M -jar generator-assembly-1.1.jar
 CONFIG ?= DefaultConfig
 ISA ?= RM64IMAFD
 C_SIM := ../emulator/emulator-rocketchip-$(CONFIG)
@@ -21,7 +22,8 @@ GITCMT := $(subst $(space),$(gitopt),$(COMMIT))
 cnight rnight crnight csuite rsuite \
 
 gen:
-	$(SBT) 'generator/run $(OPTIONS)'
+	$(SBT) $(OPTIONS)
+# 	$(SBT) 'generator/run $(OPTIONS)'
 
 csuite:
 	for i in `ls $(SUITE) | grep .S` ; do echo $$i ; \
